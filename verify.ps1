@@ -9,7 +9,7 @@ if ($env:XDG_CONFIG_HOME) {
 $TargetDir = Join-Path $ConfigBase "opencode"
 Write-Host "OpenCode config directory: $TargetDir"
 
-foreach ($Name in @("AGENTS.md", "agents")) {
+foreach ($Name in @("AGENTS.md", "agents", "commands")) {
     $Path = Join-Path $TargetDir $Name
     if (-not (Test-Path -LiteralPath $Path)) {
         throw "Missing: $Path"
@@ -22,6 +22,16 @@ if ($AgentCount -lt 10) {
 }
 
 Write-Host "Agents discovered in config directory: $AgentCount"
+
+$Commands = @("review", "security-review", "verify", "handoff", "project-docs")
+foreach ($CommandName in $Commands) {
+    $CommandPath = Join-Path (Join-Path $TargetDir "commands") "$CommandName.md"
+    if (-not (Test-Path -LiteralPath $CommandPath -PathType Leaf)) {
+        throw "Missing command: $CommandPath"
+    }
+}
+
+Write-Host "Global commands discovered in config directory: $($Commands.Count)"
 
 $OpenCode = Get-Command opencode -ErrorAction SilentlyContinue
 if ($OpenCode) {

@@ -12,7 +12,7 @@ It intentionally does not:
 - set `autoupdate`
 - set a model or provider
 - set `OPENCODE_CONFIG_DIR`
-- force active global skills or commands
+- force active global skills
 
 This keeps the OpenCode application lifecycle independent from the profile.
 
@@ -79,8 +79,18 @@ Implementation agents may edit but ask before arbitrary shell execution. Common 
 
 The test agent is instructed to modify test code only. OpenCode permissions do not provide path-level edit restrictions, so this is a behavioral constraint rather than a filesystem sandbox.
 
-## Extension points
+## Global commands and extension points
 
-`profile/skills`, `profile/commands`, `profile/tools`, and `profile/plugins` are intentionally empty except for `.gitkeep`.
+`profile/commands` contains a deliberately small set of explicit workflows:
 
-This prevents accidental global behavior while providing stable locations for future reusable capabilities.
+- `review`
+- `security-review`
+- `verify`
+- `handoff`
+- `project-docs`
+
+Review commands run through read-only specialist subagents. Verification runs in a child build session to keep the parent context focused. Handoff and project documentation run in the current build session so they can use the current conversation state as well as the repository state.
+
+`profile/skills`, `profile/tools`, and `profile/plugins` remain empty except for `.gitkeep`, providing stable extension points without loading additional global behavior.
+
+The default continuity files are `.opencode/HANDOFF.md` and `.opencode/PROJECT.md`. They are not automatically trusted: global guidance requires important facts to be verified against the repository because these files can become stale.

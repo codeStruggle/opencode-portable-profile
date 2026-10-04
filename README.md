@@ -13,7 +13,7 @@
 - 支持 Java / Spring / Spring Boot、Python、Angular / React / Vue、MongoDB、PostgreSQL、MySQL 和 Oracle。
 - 与用户交互时支持中文、德语和英语；所有程序相关产物保持英文。
 - 全局配置可复用，同时允许项目通过 `.opencode/`、`opencode.json` 和 `AGENTS.md` 添加、扩展或覆盖配置。
-- 预留全局 `skills/`、`commands/`、`tools/` 和 `plugins/` 扩展入口，但默认不启用额外行为。
+- 提供少量高价值全局 commands，并继续预留 `skills/`、`tools/` 和 `plugins/` 扩展入口。
 
 ## 包含的 Agents
 
@@ -149,9 +149,49 @@ project/
 
 示例见 `examples/project/`。
 
+## 内置全局 Commands
+
+本 profile 默认提供 5 个轻量命令：
+
+| Command | 用途 | 默认执行方式 |
+| --- | --- | --- |
+| `/review` | 对当前修改或指定目标做独立 correctness / regression review | `code-reviewer` child session |
+| `/security-review` | 对当前修改或指定目标做 focused security review | `security-auditor` child session |
+| `/verify` | 用最小必要测试、编译、lint 等验证当前实现 | `build` child session |
+| `/handoff` | 生成或更新当前工作的会话交接文件 | 当前 `build` session |
+| `/project-docs` | 根据真实仓库状态生成或更新项目技术说明 | 当前 `build` session |
+
+基本使用：
+
+```text
+/review
+/security-review
+/verify
+/handoff
+/project-docs
+```
+
+命令也可以带参数。例如：
+
+```text
+/review src/main/java/com/example/security
+/security-review authentication flow
+/verify affected module
+/handoff docs/HANDOFF.md
+/project-docs docs/PROJECT.md
+```
+
+`/handoff` 默认写入 `.opencode/HANDOFF.md`。它记录目标、当前状态、已完成内容、进行中的工作、关键决策、修改文件、验证结果、风险以及下一步，便于新的 OpenCode session 快速继续。全局 `AGENTS.md` 还要求：当上下文已经很长、继续工作存在明显 context loss / truncation 风险时，应及时提醒用户运行 `/handoff`；如果无法读取精确的剩余 token 数，则不得假装知道精确数值。
+
+`/project-docs` 默认写入 `.opencode/PROJECT.md`。它基于实际 repository、build files、项目级 `AGENTS.md`、CI 和现有 architecture documentation 创建或更新项目技术上下文，而不是根据推测生成理想化架构。
+
+这两个默认文件都是 developer-facing repository context，因此按本 profile 的语言策略使用英文。若希望写入其他路径，可以直接把目标路径作为命令参数。
+
+项目级 `.opencode/commands/` 可以使用同名 command 覆盖这些全局默认值。
+
 ## 添加全局 Skills 和 Commands
 
-默认不包含启用状态的 global skill 或 command。
+本 profile 已包含上述 5 个 global commands，但默认不包含 active global skills。
 
 添加 skill：
 

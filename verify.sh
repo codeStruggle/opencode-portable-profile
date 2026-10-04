@@ -6,7 +6,7 @@ TARGET_DIR="$CONFIG_BASE/opencode"
 
 echo "OpenCode config directory: $TARGET_DIR"
 
-required=(AGENTS.md agents)
+required=(AGENTS.md agents commands)
 for item in "${required[@]}"; do
   if [[ ! -e "$TARGET_DIR/$item" ]]; then
     echo "Missing: $TARGET_DIR/$item" >&2
@@ -21,6 +21,16 @@ if [[ "$count" -lt 10 ]]; then
 fi
 
 echo "Agents discovered in config directory: $count"
+
+commands=(review security-review verify handoff project-docs)
+for command_name in "${commands[@]}"; do
+  if [[ ! -f "$TARGET_DIR/commands/$command_name.md" ]]; then
+    echo "Missing command: $TARGET_DIR/commands/$command_name.md" >&2
+    exit 1
+  fi
+done
+
+echo "Global commands discovered in config directory: ${#commands[@]}"
 
 if command -v opencode >/dev/null 2>&1; then
   echo "OpenCode: $(command -v opencode)"

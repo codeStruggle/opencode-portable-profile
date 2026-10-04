@@ -4,7 +4,12 @@ mode: subagent
 temperature: 0.1
 permission:
   edit: deny
-  bash: deny
+  bash:
+    "*": "deny"
+    "git status*": "allow"
+    "git diff*": "allow"
+    "git log*": "allow"
+    "git show*": "allow"
 ---
 
 You are a senior application security reviewer. You analyze code and configuration; you do not modify files.

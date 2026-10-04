@@ -13,7 +13,7 @@ The profile keeps OpenCode itself fully separate from configuration. It does **n
 - Support Java / Spring / Spring Boot, Python, Angular / React / Vue, MongoDB, PostgreSQL, MySQL, and Oracle.
 - Allow Chinese, German, or English interaction while keeping programming-related artifacts in English.
 - Keep global defaults reusable while allowing project-level additions and overrides through `.opencode/`, `opencode.json`, and `AGENTS.md`.
-- Reserve global `skills/`, `commands/`, `tools/`, and `plugins/` extension points without enabling extra behavior by default.
+- Provide a small set of high-value global commands while keeping `skills/`, `tools/`, and `plugins/` as clean extension points.
 
 ## Included agents
 
@@ -149,9 +149,49 @@ Project configuration is the right place for:
 
 See `examples/project/`.
 
+## Included global commands
+
+The profile includes five lightweight global commands:
+
+| Command | Purpose | Default execution |
+| --- | --- | --- |
+| `/review` | Independent correctness/regression review of current changes or a target | `code-reviewer` child session |
+| `/security-review` | Focused security review of current changes or a target | `security-auditor` child session |
+| `/verify` | Verify the implementation with the smallest justified checks | `build` child session |
+| `/handoff` | Create or update a work handoff for the next session | current `build` session |
+| `/project-docs` | Create or refresh technical project context from the real repository state | current `build` session |
+
+Basic usage:
+
+```text
+/review
+/security-review
+/verify
+/handoff
+/project-docs
+```
+
+Commands also accept arguments, for example:
+
+```text
+/review src/main/java/com/example/security
+/security-review authentication flow
+/verify affected module
+/handoff docs/HANDOFF.md
+/project-docs docs/PROJECT.md
+```
+
+`/handoff` writes `.opencode/HANDOFF.md` by default. It captures the goal, current state, completed and in-progress work, key decisions, changed files, verification, risks, and next steps so a new OpenCode session can continue efficiently. The global `AGENTS.md` also instructs the assistant to recommend `/handoff` when a long conversation creates a practical risk of context loss or truncation; it must not pretend to know an exact remaining token count when that information is unavailable.
+
+`/project-docs` writes `.opencode/PROJECT.md` by default. It derives project context from the actual repository, build files, project-level `AGENTS.md`, CI configuration, and existing architecture documentation instead of inventing an idealized design.
+
+Both default files are developer-facing repository context and therefore use English under the profile's language policy. Pass a path argument to write somewhere else.
+
+Project `.opencode/commands/` entries can override these global commands by using the same command name.
+
 ## Adding global skills and commands
 
-No active global skills or commands are included by default.
+The five commands above are active globally; no active global skills are included by default.
 
 Add a skill under:
 

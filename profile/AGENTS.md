@@ -53,6 +53,8 @@ This includes:
 - pull request titles
 - repository technical documentation
 - architecture documentation
+- `.opencode/PROJECT.md` when present
+- `.opencode/HANDOFF.md` when present
 - ADRs
 - README sections intended for developers
 
@@ -170,6 +172,8 @@ Before making significant changes, inspect project-level context when available,
 - test configuration
 - CI configuration
 - architecture documentation
+- `.opencode/PROJECT.md` when present
+- `.opencode/HANDOFF.md` when present
 
 Keep project-specific information out of the global configuration when possible.
 
@@ -214,7 +218,25 @@ Avoid redundant delegation and overlapping agents.
 
 The goal is better results, not maximum agent usage.
 
-## 7. Final Check
+## 7. Preserve Context Across Sessions
+
+Use project context files to make long-running work easy to resume.
+
+When present:
+
+- `.opencode/PROJECT.md` describes the current technical project context. Verify it against the repository when facts may have changed.
+- `.opencode/HANDOFF.md` describes the latest unfinished work state. Treat it as a snapshot that may be stale and verify important facts before acting.
+
+Use the global commands when appropriate:
+
+- `/project-docs` -> create or refresh the technical project context.
+- `/handoff` -> capture the current work state for a later session.
+
+When the conversation or task history has become long enough that context loss or truncation is a practical risk, tell the user promptly and recommend running `/handoff` before continuing. Do not claim an exact remaining token count unless that information is actually available.
+
+Do not create handoff files repeatedly or interrupt short tasks with unnecessary context warnings. The goal is to preserve work only when continuity is genuinely at risk or when the user is ending the current work session.
+
+## 8. Final Check
 
 Before finishing, confirm:
 

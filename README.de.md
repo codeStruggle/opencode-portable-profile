@@ -13,7 +13,7 @@ Das Profil trennt OpenCode selbst vollständig von seiner Konfiguration. Es **in
 - Java / Spring / Spring Boot, Python, Angular / React / Vue, MongoDB, PostgreSQL, MySQL und Oracle unterstützen.
 - Interaktion auf Chinesisch, Deutsch oder Englisch ermöglichen, während programmbezogene Artefakte auf Englisch bleiben.
 - Wiederverwendbare globale Defaults bereitstellen und gleichzeitig projektspezifische Ergänzungen und Overrides über `.opencode/`, `opencode.json` und `AGENTS.md` erlauben.
-- Globale Erweiterungspunkte für `skills/`, `commands/`, `tools/` und `plugins/` vorsehen, ohne standardmäßig zusätzliches Verhalten zu aktivieren.
+- Eine kleine Anzahl nützlicher globaler Commands bereitstellen und `skills/`, `tools/` sowie `plugins/` als saubere Erweiterungspunkte offenhalten.
 
 ## Enthaltene Agents
 
@@ -149,9 +149,49 @@ Folgende Informationen gehören in die Projektkonfiguration:
 
 Ein Beispiel befindet sich unter `examples/project/`.
 
+## Enthaltene globale Commands
+
+Das Profil enthält fünf leichtgewichtige globale Commands:
+
+| Command | Zweck | Standardausführung |
+| --- | --- | --- |
+| `/review` | Unabhängiges Correctness-/Regression-Review der aktuellen Änderungen oder eines Ziels | `code-reviewer` Child-Session |
+| `/security-review` | Gezieltes Security Review der aktuellen Änderungen oder eines Ziels | `security-auditor` Child-Session |
+| `/verify` | Implementierung mit den kleinsten erforderlichen Checks verifizieren | `build` Child-Session |
+| `/handoff` | Arbeitsstand für die nächste Session erzeugen oder aktualisieren | aktuelle `build`-Session |
+| `/project-docs` | Technischen Projektkontext aus dem tatsächlichen Repository-Zustand erzeugen oder aktualisieren | aktuelle `build`-Session |
+
+Grundlegende Nutzung:
+
+```text
+/review
+/security-review
+/verify
+/handoff
+/project-docs
+```
+
+Commands können auch Argumente erhalten, zum Beispiel:
+
+```text
+/review src/main/java/com/example/security
+/security-review authentication flow
+/verify affected module
+/handoff docs/HANDOFF.md
+/project-docs docs/PROJECT.md
+```
+
+`/handoff` schreibt standardmäßig `.opencode/HANDOFF.md`. Die Datei hält Ziel, aktuellen Stand, abgeschlossene und laufende Arbeit, wichtige Entscheidungen, geänderte Dateien, Verifikation, Risiken und nächste Schritte fest, sodass eine neue OpenCode-Session effizient fortsetzen kann. Das globale `AGENTS.md` weist den Assistenten außerdem an, `/handoff` rechtzeitig zu empfehlen, wenn eine lange Unterhaltung ein reales Risiko für Context Loss oder Truncation erzeugt; ohne verfügbare Messdaten darf keine exakte verbleibende Token-Zahl behauptet werden.
+
+`/project-docs` schreibt standardmäßig `.opencode/PROJECT.md`. Der Projektkontext wird aus dem tatsächlichen Repository, Build-Dateien, projektspezifischem `AGENTS.md`, CI-Konfiguration und vorhandener Architektur-Dokumentation abgeleitet, statt eine ideale Architektur zu erfinden.
+
+Beide Standarddateien sind entwicklerorientierter Repository-Kontext und werden deshalb gemäß der Sprachrichtlinie auf Englisch geschrieben. Für einen anderen Zielpfad kann dieser als Argument übergeben werden.
+
+Projektspezifische `.opencode/commands/` können diese globalen Commands mit demselben Namen überschreiben.
+
 ## Globale Skills und Commands hinzufügen
 
-Standardmäßig sind keine aktiven globalen Skills oder Commands enthalten.
+Die fünf oben genannten Commands sind global aktiv; aktive globale Skills werden standardmäßig nicht mitgeliefert.
 
 Skill hinzufügen:
 
