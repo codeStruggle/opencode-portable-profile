@@ -1,0 +1,14 @@
+* text=auto
+
+# Keep shell scripts executable and with Unix line endings.
+*.sh text eol=lf
+
+# PowerShell scripts use Windows line endings on checkout.
+*.ps1 text eol=crlf
+
+# Repository configuration and documentation stay stable across platforms.
+*.md text eol=lf
+*.json text eol=lf
+*.jsonc text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
